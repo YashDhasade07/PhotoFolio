@@ -40,9 +40,9 @@
     font-weight: 600;
 }
 
-.albums {
-    display: flex;
-    flex-direction: row;
+.albums-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
     gap: 10px;
     margin-top: 10px;
 }

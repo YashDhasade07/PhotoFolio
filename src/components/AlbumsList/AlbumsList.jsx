@@ -30,7 +30,7 @@ export default function AlbumsList(){
                     <h1>Create an Album</h1>
                 </div>
                 <div className='input'>
-                    <input type='text' value={formValue} onChange={(e)=>setFormValue(e.target.value)} />
+                    <input type='text' value={formValue} onChange={(e)=>setFormValue(e.target.value)} placeholder='Album Name' />
                     <button className='red' onClick={clearForm}>Clear</button>
                     <button className='blue' onClick={createAlbum}>Create</button>
                 </div>
