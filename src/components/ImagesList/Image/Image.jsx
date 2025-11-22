@@ -25,7 +25,12 @@ export default function Image({ images, setShowCarousal, setCarousalCurrentIndex
                                     deleteImage(image.id)
                                 }} />
                         </div>
-                        <img className='image' src={image.url} alt={image.title} />
+                        <img className='image' src={image.url} alt={image.title}
+                            onError={(e) => {
+                                e.target.onerror = null; // prevent infinite loop if backup also fails
+                                e.target.src = "https://photo-folio-cn.netlify.app/assets/warning.png";
+                            }}
+                        />
                         <h3>{image.title}</h3>
                     </div>
                 ))}

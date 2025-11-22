@@ -1,54 +1,107 @@
 import { useEffect, useState } from 'react'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar/Navbar'
-// import './App.css'
 import AlbumsList from './components/AlbumsList/AlbumsList'
 import ImagesList from './components/ImagesList/ImagesList'
+import Spinner from 'react-spinner-material';
+
+import {
+  createAlbum as createAlbumInDB,
+  subscribeToAlbums,
+  createImage as createImageInDB,
+  subscribeToImages,
+  updateImage as updateImageInDB,
+  deleteImage as deleteImageFromDB
+} from './firebaseConfig/firestoreService';
 
 function App() {
-  const [albums, setAlbums] = useState([{ id: 1, name: 'Test Album' }, { id: 2, name: 'Test Album' }, { id: 3, name: 'Test Album' }, { id: 4, name: 'Test Album' }, { id: 5, name: 'Test Album' }, { id: 6, name: 'Test Album' },])
-  const [images, setImages] = useState([{ id: 1, albumId: 2, title: 'Test Image yash', url: 'https://images.pexels.com/photos/1533483/pexels-photo-1533483.jpeg?cs=srgb&dl=light-dawn-landscape-1533483.jpg&fm=jpg' },
-                                        { id: 2, albumId: 2, title: ' Image', url: 'https://jooinn.com/images/beautiful-waterfall-5.jpg' },
-                                        { id: 3, albumId: 2, title: 'Test Image', url: 'https://th.bing.com/th/id/R.829843c130c948d4fbb835dae965a5da?rik=LCpFbdcAeWDZ8w&riu=http%3a%2f%2fwallpapercave.com%2fwp%2ffAwVCh3.jpg&ehk=lGN4CaEuFMjMiZTZ2nF9id7MRRJ3e1tiWELDbLGorPE%3d&risl=&pid=ImgRaw&r=0' },
-                                        { id: 4, albumId: 2, title: ' Image', url: 'https://images.pexels.com/photos/1533483/pexels-photo-1533483.jpeg?cs=srgb&dl=light-dawn-landscape-1533483.jpg&fm=jpg' },
-                                        { id: 5, albumId: 2, title: ' Image', url: 'https://jooinn.com/images/beautiful-waterfall-5.jpg' },
-                                        { id: 6, albumId: 2, title: ' Image', url: 'https://th.bing.com/th/id/R.829843c130c948d4fbb835dae965a5da?rik=LCpFbdcAeWDZ8w&riu=http%3a%2f%2fwallpapercave.com%2fwp%2ffAwVCh3.jpg&ehk=lGN4CaEuFMjMiZTZ2nF9id7MRRJ3e1tiWELDbLGorPE%3d&risl=&pid=ImgRaw&r=0' },
-                                      ])
+  const [albums, setAlbums] = useState([])
+  const [images, setImages] = useState([])
   const [albumId, setAlbumId] = useState(null)
-  
-  const createAlbum = (id, name) => {
-    setAlbums((prev) => (
-      [{ id, name }, ...prev]
-    ))
-  }
-  const deleteImage = (id) => {
-    setImages((prev) => (
-      prev.filter((img)=> img.id !== id)
-    ))
-  }
+  const [loading, setLoading] = useState(true);
+
+  // Subscribe to albums collection with real-time updates
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribe = subscribeToAlbums((fetchedAlbums) => {
+      setAlbums(fetchedAlbums);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Subscribe to images collection with real-time updates
+  useEffect(() => {
+    const unsubscribe = subscribeToImages((fetchedImages) => {
+      setImages(fetchedImages);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const createAlbum = async (name) => {
+    try {
+      await createAlbumInDB(name);
+      toast.success('Album created successfully!');
+    } catch (error) {
+      console.error('Failed to create album:', error);
+      toast.error('Failed to create album. Please try again.');
+    }
+  };
+
+  const deleteImage = async (id) => {
+    try {
+      await deleteImageFromDB(id);
+      toast.success('Image deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      toast.error('Failed to delete image. Please try again.');
+    }
+  };
 
   // useEffect(()=>console.log(image),[image])
-
-  const uploadImages = (data,id) => {
-    if(id){
-      setImages((prev) => (
-        prev.map((img)=>{
-          if(img.id === id){
-            return { id, ...data }
-          }
-          return img
-        })
-      ))
-    }else{
-      setImages((prev) => (
-        [...prev, { id: new Date().getTime(), ...data }]
-      ))
+  
+ // Handle both image creation and update
+  const uploadImages = async (data, id) => {
+    try {
+      if (id) {
+        await updateImageInDB(id, data);
+        toast.success('Image updated successfully!');
+      } else {
+        await createImageInDB(data);
+        toast.success('Image added successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      toast.error('Failed to upload image. Please try again.');
     }
-  }
+  };
 
   return (
     <>
       <Navbar />
-      {albumId
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      {loading ? (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '80vh'
+        }}>
+          <Spinner radius={120} color={"#0077ff"} stroke={6} visible={true} />
+        </div>
+      ) : albumId
         ? <ImagesList images={images.filter((image) => image.albumId === albumId)} uploadImages={uploadImages} albumId={albumId} setAlbumId={setAlbumId} deleteImage={deleteImage} />
         : <AlbumsList albums={albums} createAlbums={createAlbum} setAlbumId={setAlbumId} />
       }

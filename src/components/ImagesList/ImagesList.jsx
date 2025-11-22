@@ -6,6 +6,7 @@ import ClearLogo from '../../assets/clear.png'
 import Image from "./Image/Image"
 import Carousel from "./Carousel/Carousel"
 import ImageForm from "./imageForm/ImageForm"
+import Spinner from 'react-spinner-material';
 
 export default function ImagesList({ images, uploadImages, albumId, setAlbumId, deleteImage }) {
     // const [image, setAlbums] = useState([{id: 1, title: 'Test Album' },])
@@ -17,8 +18,9 @@ export default function ImagesList({ images, uploadImages, albumId, setAlbumId, 
     const [showCarousal, setShowCarousal] = useState(false);
     const [carousalCurrentIndex, setCarousalCurrentIndex] = useState(0);
     const [filteredImages, setFilteredImages] = useState(images);
+    const [isLoading, setIsLoading] = useState(false);
 
-
+//  Prevent body scroll when carousel is open
     useEffect(() => {
         if (showCarousal) {
             document.body.style.overflow = 'hidden';
@@ -34,6 +36,9 @@ export default function ImagesList({ images, uploadImages, albumId, setAlbumId, 
     const clearForm = () => {
         setFormValue({ title: '', url: '' })
     }
+
+
+// Prefill form for editing existing image
     const setEdit = (id) => {
         let image = images.find((img) => img.id === id)
         setShowForm(true)
@@ -48,19 +53,25 @@ export default function ImagesList({ images, uploadImages, albumId, setAlbumId, 
     const updateFormValue = (value, field) => {
         setFormValue((prevVal) => ({ ...prevVal, [field]: value }))
     }
-    const createImage = () => {
+    const createImage = async () => {
         if (formValue.title.trim() && formValue.url.trim()) {
-            if (isEdit !== null) {
-                uploadImages({ albumId, ...formValue }, isEdit)
-            } else {
-                uploadImages({ albumId, ...formValue })
+            setIsLoading(true);
+            try {
+                if (isEdit !== null) {
+                    await uploadImages({ albumId, ...formValue }, isEdit);
+                } else {
+                    await uploadImages({ albumId, ...formValue });
+                }
+                clearForm();
+                setShowForm(false);
+                setIsEdit(null);
+            } finally {
+                setIsLoading(false);
             }
-            clearForm()
-            setShowForm(false)
-            setIsEdit(null)
         }
-    }
+    };
 
+    // Carousel navigation with wrap-around using modulo
     const prevImage = () => {
         setCarousalCurrentIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length)
     }
@@ -68,14 +79,18 @@ export default function ImagesList({ images, uploadImages, albumId, setAlbumId, 
         setCarousalCurrentIndex((prev) => (prev + 1) % filteredImages.length)
     }
 
+    // Filter images based on search query
     useEffect(() => {
         searchValue
             ? setFilteredImages(images.filter((img) => img.title.toLowerCase().includes(searchValue.toLowerCase())))
             : setFilteredImages(images)
     }, [searchValue, images])
+
+
+
     return (
         <div className="image-list">
-            {showForm && <ImageForm isEdit={isEdit} formValue={formValue} updateFormValue={updateFormValue} clearForm={clearForm} createImage={createImage} />}
+            {showForm && <ImageForm isEdit={isEdit} formValue={formValue} updateFormValue={updateFormValue} clearForm={clearForm} createImage={createImage} isLoading={isLoading} />}
 
             <div className='image-title'>
                 <div className="left">
@@ -99,7 +114,7 @@ export default function ImagesList({ images, uploadImages, albumId, setAlbumId, 
             </div>
             {filteredImages.length === 0 ? (
                 <div className="empty-state">
-                    <h3 style={{color: 'red'}}>No images found. {searchValue ? 'Try a different search.' : 'Add some images!'}</h3>
+                    <h3 style={{ color: 'red' }}>No images found. {searchValue ? 'Try a different search.' : 'Add some images!'}</h3>
                 </div>
             ) : <Image setShowCarousal={setShowCarousal} setCarousalCurrentIndex={setCarousalCurrentIndex} images={filteredImages} setEdit={setEdit} deleteImage={deleteImage} />}
 
