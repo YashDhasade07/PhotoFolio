@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Album from './Album/Album'
+import AlbumForm from './AlbumForm/AlbumForm'
 import './albumsList.css'
 
 export default function AlbumsList({albums, createAlbums, setAlbumId}){
@@ -24,18 +25,7 @@ export default function AlbumsList({albums, createAlbums, setAlbumId}){
     return (
 
         <div className='album-list'>
-            {showForm && (
-            <div className = 'album-form'>
-                <div>
-                    <h1>Create an Album</h1>
-                </div>
-                <div className='input'>
-                    <input type='text' value={formValue} onChange={(e)=>setFormValue(e.target.value)} placeholder='Album Name' />
-                    <button className='red' onClick={clearForm}>Clear</button>
-                    <button className='blue' onClick={createAlbum}>Create</button>
-                </div>
-            </div>) 
-            }
+            {showForm && <AlbumForm formValue={formValue} setFormValue={setFormValue} clearForm={clearForm} createAlbum={createAlbum} />}
 
             <div className='title'>
                 <h2>Your Albums</h2>

@@ -90,8 +90,14 @@
     border-radius: 5px;
     text-align: center;
     box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
+    position: relative;
 
 }
+
+.galary:hover .galary-btn{
+    opacity: 1;
+}
+
 .galary h3{
     margin: 0px;
 }
@@ -104,4 +110,66 @@
     height: 160px;
     width: 200px;
     border: 0.2px solid black;
+}
+
+.galary-btn{
+    position: absolute;
+    right: 10px;
+    top: -10px;
+    opacity: 0;
+}
+
+.galary-btn img{
+    height: 40px;
+    margin: 0px 2.5px;
+    background-color: #fff;
+    border-radius: 50%;
+}
+.galary-btn img:hover{
+   transform: scale(1.1);
+}
+
+
+
+/* Carousel  */
+
+.carousel-overlay{
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.carousel{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.close{
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.carousel-btn{
+    background-color: #fff;
+    height: 35px;
+    width: 35px;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 1);
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.carousal-image{
+    /* height: 75vh;
+    width: 110vh; */
+    height: 60vh;
+    width: 40vw;
 }
