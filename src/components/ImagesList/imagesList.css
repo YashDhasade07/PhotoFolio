@@ -75,6 +75,14 @@
     font-weight: 600;
 }
 
+.right input[name="search"] {
+    height: 25px;
+    padding: 3px 8px;
+    border: 2px solid #0077ff;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
 .image-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 columns */

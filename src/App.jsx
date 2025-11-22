@@ -32,7 +32,7 @@ function App() {
     if(id){
       setImages((prev) => (
         prev.map((img)=>{
-          if(img.id == id){
+          if(img.id === id){
             return { id, ...data }
           }
           return img

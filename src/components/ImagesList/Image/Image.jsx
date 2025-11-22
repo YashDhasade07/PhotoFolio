@@ -19,7 +19,7 @@ export default function Image({ images, setShowCarousal, setCarousalCurrentIndex
                                     setEdit(image.id)
                                 }}
                                 alt='Edit' />
-                            <img src={BinLogo} alt='Remove'
+                            <img src={BinLogo} alt='Delete'
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     deleteImage(image.id)
